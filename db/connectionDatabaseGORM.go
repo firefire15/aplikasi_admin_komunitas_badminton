@@ -130,19 +130,56 @@ func ConnectDatabase() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("Peringatan: Tidak dapat menemukan file .env")
+		log.Println("Peringatan: Tidak dapat menemukan file .env, menggunakan environment variables yang tersedia")
 	}
 
-	host     := os.Getenv("PGHOST")
-	port     := os.Getenv("PGPORT")
-	user     := os.Getenv("PGUSER")
-	password := os.Getenv("PGPASSWORD")
-	dbName   := os.Getenv("PGDATABASE")
+	var dsn string
 
-	fmt.Println("data ", host, port, user, password, dbName)
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL != "" {
+		log.Println("[DB] Menggunakan DATABASE_URL untuk koneksi")
+		dsn = databaseURL
+	} else {
+		host     := os.Getenv("PGHOST")
+		port     := os.Getenv("PGPORT")
+		user     := os.Getenv("PGUSER")
+		password := os.Getenv("PGPASSWORD")
+		dbName   := os.Getenv("PGDATABASE")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta", host, user, password, dbName, port)
-	
+		// Debug logging untuk diagnosa environment variables
+		log.Printf("[DB] PGHOST     = %q", host)
+		log.Printf("[DB] PGPORT     = %q", port)
+		log.Printf("[DB] PGUSER     = %q", user)
+		log.Printf("[DB] PGDATABASE = %q", dbName)
+		log.Printf("[DB] PGPASSWORD = %q (length: %d)", func() string {
+			if password != "" { return "***" }
+			return ""
+		}(), len(password))
+
+		// Fallback default values jika variabel kosong
+		if host == "" {
+			host = "localhost"
+			log.Println("[DB] PGHOST kosong, menggunakan default: localhost")
+		}
+		if port == "" {
+			port = "5432"
+			log.Println("[DB] PGPORT kosong, menggunakan default: 5432")
+		}
+		if user == "" {
+			user = "postgres"
+			log.Println("[DB] PGUSER kosong, menggunakan default: postgres")
+		}
+		if dbName == "" {
+			dbName = "postgres"
+			log.Println("[DB] PGDATABASE kosong, menggunakan default: postgres")
+		}
+
+		dsn = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta",
+			host, user, password, dbName, port,
+		)
+	}
+
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Gagal terhubung ke database: ", err)
@@ -156,6 +193,6 @@ func ConnectDatabase() {
 	}
 
 	DB = database
-	fmt.Println("Koneksi database berhasil dan migrasi selesai!")
+	log.Println("Koneksi database berhasil dan migrasi selesai!")
 
 }
