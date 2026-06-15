@@ -1,5 +1,4 @@
 
-Markdown
 # 🏸 Badminton Community Management API
 
 API berbasis Go (Gin Framework) dan GORM yang dirancang untuk mengelola komunitas badminton (mabar), penjadwalan lapangan, pencatatan transaksi *shuttlecock*, statistik pertandingan, hingga kalkulasi tagihan iuran bulanan/sesi secara otomatis.
