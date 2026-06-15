@@ -1,4 +1,3 @@
-Berikut adalah draf dokumentasi README.md yang bersih, terstruktur, dan profesional untuk API manajemen komunitas badminton Anda. Dokumentasi ini memisahkan endpoint publik dengan endpoint yang memerlukan autentikasi JWT (protected), lengkap dengan contoh struktur data (payload) berdasarkan struct Go yang Anda miliki.
 
 Markdown
 # 🏸 Badminton Community Management API
